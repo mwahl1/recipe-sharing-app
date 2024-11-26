@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>{{ recipe.title }}</h2>
+            <p>By {{ recipe.author.username }} on {{ recipe.created_at|date:"F j, Y" }}</p>
+            {% if average_rating %}
+                <p>Average Rating: {{ average_rating|floatformat:1 }}/5</p>
+            {% else %}
+                <p>No ratings yet.</p>
+            {% endif %}
+            {% if recipe.image %}
+            <img src="{{ recipe.image.url }}" class="img-fluid" alt="{{ recipe.title }}">
+            {% endif %}
+            <h4>Description</h4>
+            <p>{{ recipe.description }}</p>
+            <h4>Ingredients</h4>
+            <ul>
+                {% for ingredient in recipe.ingredients.splitlines %}
+                <li>{{ ingredient }}</li>
+                {% endfor %}
+            </ul>
+            <h4>Instructions</h4>
+            <p>{{ recipe.instructions }}</p>
+        </div>
+        <div class="col-md-4">
+            {% if user.is_authenticated %}
+                {% if is_favorited %}
+                    <a href="{% url 'remove-favorite' recipe.pk %}" class="btn btn-danger">Unfavorite</a>
+                {% else %}
+                    <a href="{% url 'add-favorite' recipe.pk %}" class="btn btn-success">Favorite</a>
+                {% endif %}
+                {% if user == recipe.author %}
+                    <a href="{% url 'recipe-update' recipe.pk %}" class="btn btn-warning">Edit</a>
+                    <a href="{% url 'recipe-delete' recipe.pk %}" class="btn btn-danger">Delete</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Reviews</h3>
+            {% for review in reviews %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ review.author.username }} - {{ review.rating }}/5</h5>
+                        <p class="card-text">{{ review.comment }}</p>
+                        <p class="card-text"><small class="text-muted">{{ review.created_at|date:"F j, Y" }}</small></p>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No reviews yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% if user.is_authenticated %}
+        <hr>
+        <div class="row">
+            <div class="col-md-12">
+                <h4>Add a Review</h4>
+                <form method="post" action="{% url 'add-review' recipe.pk %}">
+                    {% csrf_token %}
+                    {{ review_form|crispy }}
+                    <button type="submit" class="btn btn-primary">Submit Review</button>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <p><a href="{% url 'login' %}">Login</a> to add a review.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,13 @@
+<!-- recipes/templates/recipes/home.html -->
+
+{% extends 'recipes/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Welcome to the Recipe Sharing App!</h1>
+    <p>Discover and share delicious recipes.</p>
+    <a href="{% url 'recipe-list' %}" class="btn btn-primary">View Recipes</a>
+</div>
+{% endblock %}
